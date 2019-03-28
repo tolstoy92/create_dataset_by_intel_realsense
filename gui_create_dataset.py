@@ -180,9 +180,16 @@ class App:
         except:
             pass
         try:
-            dir_name = str(datetime.datetime.now())[:-7]
-            with open(dir_name + '.json', 'w') as fp:
-                json.dump(self.geom_mass_dict, fp)
+            anat_file_name = 'anat.json'
+            if anat_file_name in os.listdir(os.getcwd()):
+                with open(os.path.join(os.getcwd(), anat_file_name)) as fp:
+                    data = json.load(fp)
+            else:
+                data = {}
+            data.update(self.geom_mass_dict)
+
+            with open(os.path.join(os.getcwd(), anat_file_name), 'w') as fp:
+                json.dump(data, fp)
         except:
             pass
 
