@@ -59,7 +59,22 @@ class App:
         mass_area_label.grid(row=5, column=0)
         self.mass_area.grid(row=6, column=0)
 
-        self.photo_counter = 0
+        try:
+            anat_file_name = 'annotation.json'
+            if anat_file_name in os.listdir(os.getcwd()):
+                with open(os.path.join(os.getcwd(), anat_file_name)) as fp:
+                    json_data = json.load(fp)
+                    if len(json_data):
+                        data = json_data
+                    else:
+                        data = {}
+            else:
+                data = {}
+
+            self.photo_counter = len(data)
+        except:
+            self.photo_counter = 0
+
         self.geom_mass_dict = {}
 
         self.delay = 1
@@ -200,7 +215,11 @@ class App:
             anat_file_name = 'annotation.json'
             if anat_file_name in os.listdir(os.getcwd()):
                 with open(os.path.join(os.getcwd(), anat_file_name)) as fp:
-                    data = json.load(fp)
+                    json_data = json.load(fp)
+                    if len(json_data):
+                        data = json_data
+                    else:
+                        data = {}
             else:
                 data = {}
             data.update(self.geom_mass_dict)
@@ -208,7 +227,7 @@ class App:
             with open(os.path.join(os.getcwd(), anat_file_name), 'w') as fp:
                 json.dump(data, fp)
         except:
-            pass
+            print("Cannot open annotation.json!")
 
 class RealSenseVideoCapture:
     def __init__(self, video_width, video_height, fps):
