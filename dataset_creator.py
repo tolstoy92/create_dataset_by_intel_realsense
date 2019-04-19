@@ -35,22 +35,26 @@ class App:
         wideo_writer_button.grid(row=4, column=1)
 
         make_photo_button = Button(window, text='Make photo', command=self.make_photos)
-        make_photo_button.grid(row=7, column=0)
+        make_photo_button.grid(row=9, column=0)
 
         width_area_label = Label(self.window, text='WIDTH')
         height_area_label = Label(self.window, text='HEIGHT')
         mass_area_label = Label(self.window, text='MASS')
+        class_area_label = Label(self.window, text='CLASS')
 
         self.info = Text(self.window, height=1, width = 20)
-        self.info.grid(row = 8, column=0)
+        self.info.grid(row = 10, column=0)
 
         self.cucumber_width = StringVar()
         self.cucumber_height = StringVar()
         self.cucumber_mass = StringVar()
+        self.cucumber_class = StringVar()
 
         self.width_area = Entry(self.window, textvariable=self.cucumber_width)
         self.height_area = Entry(self.window, textvariable=self.cucumber_height)
         self.mass_area = Entry(self.window, textvariable=self.cucumber_mass)
+        self.class_area = Entry(self.window, textvariable=self.cucumber_class)
+
 
         width_area_label.grid(row=1, column=0)
         self.width_area.grid(row=2, column=0)
@@ -58,6 +62,9 @@ class App:
         self.height_area.grid(row=4, column=0)
         mass_area_label.grid(row=5, column=0)
         self.mass_area.grid(row=6, column=0)
+        class_area_label.grid(row=7, column=0)
+        self.class_area.grid(row=8,column=0)
+
 
         try:
             anat_file_name = 'annotation.json'
@@ -85,12 +92,13 @@ class App:
     def write_video(self):
         self.WRITE_VIDEO = not self.WRITE_VIDEO
 
-    def write_data_in_dict(self, name, width: str, height: str, mass: str):
+    def write_data_in_dict(self, name, width: str, height: str, mass: str, clss: str):
         try:
             w = float(width)
             h = float(height)
             m = float(mass)
-            self.geom_mass_dict[name] = w, h, m
+            c = str(clss)
+            self.geom_mass_dict[name] = w, h, m, c
             return True
         except:
             return False
@@ -98,9 +106,10 @@ class App:
     def make_photos(self):
         self.info.delete('1.0', END)
         time = str(datetime.datetime.now())[:-3]
-        if self.cucumber_width.get() and self.cucumber_height.get() and self.cucumber_mass.get():
-            if self.write_data_in_dict(time, self.cucumber_width.get(),
-                                       self.cucumber_height.get(), self.cucumber_mass.get()):
+        if self.cucumber_width.get() and self.cucumber_height.get() and \
+                self.cucumber_mass.get() and self.cucumber_class.get():
+            if self.write_data_in_dict(time, self.cucumber_width.get(), self.cucumber_height.get(),
+                                       self.cucumber_mass.get(), self.cucumber_class.get()):
                 photos_dir = 'photos'
                 if not photos_dir in list(os.listdir(os.getcwd())):
                     os.mkdir(os.path.join(os.getcwd(), photos_dir))
@@ -114,6 +123,7 @@ class App:
                 self.width_area.delete(0, 'end')
                 self.height_area.delete(0, 'end')
                 self.mass_area.delete(0, 'end')
+                self.class_area.delete(0, 'end')
 
                 self.info["bg"] = 'green'
                 self.info.insert(END, 'Saved photo #{}!'.format(self.photo_counter))
