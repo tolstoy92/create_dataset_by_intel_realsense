@@ -3,6 +3,11 @@ import datetime
 import pyrealsense2 as rs
 import numpy as np
 import os
+from time import sleep
+from playsound import playsound
+
+sleep_time = 60
+max_session_counter = 1000
 
 
 def check_dir(root_dir, dir_name):
@@ -14,6 +19,7 @@ def check_dir(root_dir, dir_name):
 def create_photo_name(counter):
     photo_format = '.png'
     return str(counter) + photo_format
+
 
 def get_aligned_frames(rs_frames):
     align = rs.align(rs.stream.color)
@@ -37,8 +43,11 @@ def rechannel_depth(depth_img, alpha=0.05):
 def create_counter(dir):
     f_names = os.listdir(dir)
     nums = list( int(num[:-4]) for num in f_names)
-    counter = max(nums)
-    return counter
+    if len(nums):
+        return max(nums)
+    else:
+        return 0
+
 
 photos_dir_name = 'autosaved_photos'
 rgb_photos_dir_name = 'rgb_photos'
@@ -67,7 +76,11 @@ cv2.resizeWindow('img', 640, 720)
 
 frames_counter = 0
 
-while RUN:
+sleep(30)
+playsound('start.mp3')
+session_counter = 0
+
+while RUN and session_counter < max_session_counter:
     rs_frames = pipeline.wait_for_frames()
     color_frame, depth_frame = get_aligned_frames(rs_frames)
     img = rs_frame_to_cv_image(color_frame)
@@ -83,10 +96,14 @@ while RUN:
         depth_save_path = os.path.join(depth_path, create_photo_name(files_counter))
         cv2.imwrite(img_save_path, img)
         cv2.imwrite(depth_save_path, depth)
-        counter += 1
+        files_counter += 1
         frames_counter = 0
+        session_counter += 1
     if cv2.waitKey(10) & 0xFF == 27:
         RUN = False
 
 cv2.destroyAllWindows()
 pipeline.stop()
+
+playsound('bell.mp3')
+
